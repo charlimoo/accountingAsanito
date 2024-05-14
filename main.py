@@ -111,11 +111,11 @@ def calculate_commissions(sales_file, people, logs):
         if salary < 10:
             adjustment_rate = 0
         elif 10 <= salary < 100000000:
-            adjustment_rate = 0.005
+            adjustment_rate = 0.0050
         elif 100000000 <= salary <= 150000000:
-            adjustment_rate = 0.075
+            adjustment_rate = 0.0075
         else:
-            adjustment_rate = 0.01
+            adjustment_rate = 0.0100
         adjustment = salary * adjustment_rate
         final_commission = total_commission - adjustment
         log_entry = {
