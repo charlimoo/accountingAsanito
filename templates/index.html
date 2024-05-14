@@ -37,11 +37,11 @@
             gap: 10px;
         }
         
-        input[type="file"] {
+        input[type="file"], input[type="number"] {
             padding: 8px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            width: 97%; /* Make the input take the full width */
+            width: 97%; 
         }
         
         button {
@@ -109,17 +109,141 @@
             justify-content: space-between;
             align-items: center;
         }
+
+        .percentages-inputs {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            margin-top: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 5px;
+            font-size: 0.8em;
+            width: 100%;
+        }
+
+        .input-group label {
+            flex: 1;
+            text-align: right;
+        }
+
+        .input-group input {
+            padding: 5px;
+            font-size: 0.8em;
+            flex: 1;
+        }
+
+        .toggle-btn {
+            font-size: 0.9em;
+            padding: 6px 12px;
+            background-color: #1e1e1e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .toggle-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
+    <script>
+        function togglePercentagesInputs() {
+            var percentagesInputs = document.querySelector('.percentages-inputs');
+            if (percentagesInputs.style.display === 'none' || percentagesInputs.style.display === '') {
+                percentagesInputs.style.display = 'flex';
+            } else {
+                percentagesInputs.style.display = 'none';
+            }
+        }
+
+        function includeHiddenInputs() {
+            var inputs = document.querySelectorAll('.percentages-inputs input');
+            inputs.forEach(input => {
+                if (!input.required) {
+                    input.required = true;
+                }
+            });
+        }
+    </script>
 </head>
 <body>
     <div class="container">
         <h1>محاسبه کمیسیون</h1>
-        <form action="/calculate" method="post" enctype="multipart/form-data">
+        <form action="/calculate" method="post" enctype="multipart/form-data" onsubmit="includeHiddenInputs()">
             <label for="people_file">فایل داده‌های افراد CSV:</label>
             <input type="file" name="people_file" id="people_file" accept=".csv" required>
             <label for="sales_file">فایل داده‌های فروش CSV:</label>
             <input type="file" name="sales_file" id="sales_file" accept=".csv" required>
+
             <button type="submit">محاسبه</button>
+
+            <button class="toggle-btn" type="button" onclick="togglePercentagesInputs()">تغییر درصدهای فروش</button>
+
+            <div class="percentages-inputs">
+                <div class="input-group">
+                    <label>فروش</label>
+                    <label>بازاریاب</label>
+                    <label>مدیر فروش</label>
+                    <label>مذاکره کننده ارشد</label>
+                    <label>هماهنگ کننده</label>
+                </div>
+                <div class="input-group">
+                    <label>از 0 تا </label>
+                    <input type="number" name="percent_0_50_marketer" value="0" required>
+                    <input type="number" name="percent_0_50_sales_manager" value="0" required>
+                    <input type="number" name="percent_0_50_senior_negotiator" value="0" required>
+                    <input type="number" name="percent_0_50_sales_coordinator" value="0" required>
+                </div>
+                <div class="input-group">
+                    <label>از 50 تا 150:</label>
+                    <input type="number" name="percent_50_150_marketer" value="4" required>
+                    <input type="number" name="percent_50_150_sales_manager" value="3" required>
+                    <input type="number" name="percent_50_150_senior_negotiator" value="10" required>
+                    <input type="number" name="percent_50_150_sales_coordinator" value="2" required>
+                </div>
+                <div class="input-group">
+                    <label>از 150 تا 300:</label>
+                    <input type="number" name="percent_150_300_marketer" value="5" required>
+                    <input type="number" name="percent_150_300_sales_manager" value="4" required>
+                    <input type="number" name="percent_150_300_senior_negotiator" value="11" required>
+                    <input type="number" name="percent_150_300_sales_coordinator" value="4" required>
+                </div>
+                <div class="input-group">
+                    <label>از 300 تا 500:</label>
+                    <input type="number" name="percent_300_500_marketer" value="7" required>
+                    <input type="number" name="percent_300_500_sales_manager" value="6" required>
+                    <input type="number" name="percent_300_500_senior_negotiator" value="12" required>
+                    <input type="number" name="percent_300_500_sales_coordinator" value="5" required>
+                </div>
+                <div class="input-group">
+                    <label>از 500 تا 800:</label>
+                    <input type="number" name="percent_500_800_marketer" value="8" required>
+                    <input type="number" name="percent_500_800_sales_manager" value="7" required>
+                    <input type="number" name="percent_500_800_senior_negotiator" value="14" required>
+                    <input type="number" name="percent_500_800_sales_coordinator" value="6" required>
+                </div>
+                <div class="input-group">
+                    <label>از 800 تا 1000:</label>
+                    <input type="number" name="percent_800_1000_marketer" value="9" required>
+                    <input type="number" name="percent_800_1000_sales_manager" value="8" required>
+                    <input type="number" name="percent_800_1000_senior_negotiator" value="21" required>
+                    <input type="number" name="percent_800_1000_sales_coordinator" value="7" required>
+                </div>
+                <div class="input-group">
+                    <label>از 1000 تا 10000:</label>
+                    <input type="number" name="percent_1000_10000_marketer" value="10" required>
+                    <input type="number" name="percent_1000_10000_sales_manager" value="10" required>
+                    <input type="number" name="percent_1000_10000_senior_negotiator" value="22" required>
+                    <input type="number" name="percent_1000_10000_sales_coordinator" value="8" required>
+                </div>
+            </div>
         </form>
         
         <hr style="border:solid; border-width: 1px; border-color:#ccc; margin: 32px;">
@@ -248,10 +372,3 @@
     </div>
 </body>
 </html>
-
-
-
-
-
-
-

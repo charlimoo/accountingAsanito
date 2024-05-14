@@ -12,19 +12,24 @@ class People:
     def get_person_data(self, person_name):
         return self.people_data.get(person_name.lower())
 
-def get_sales_percentages(sales_amount):
-    if 500_000_000 <= sales_amount <= 1_500_000_000:
-        return (5, 3, 10, 2)
-    elif 1_500_000_000 < sales_amount <= 3_000_000_000:
-        return (6, 4, 11, 4)
-    elif 3_000_000_000 < sales_amount <= 5_000_000_000:
-        return (7, 6, 12, 5)
-    elif 5_000_000_000 <= sales_amount <= 8_000_000_000:
-        return (8, 7, 14, 6)
-    elif 8_000_000_000 <= sales_amount <= 10_000_000_000:
-        return (9, 8, 21, 7)
-    elif sales_amount > 10_000_000_000:
-        return (10, 10, 22, 8)
+def get_sales_percentages(sales_amount, percentages):
+    # Convert sales amount to millions for comparison
+    sales_amount /= 1_000_000
+    
+    if 0 <= sales_amount < 50:
+        return percentages.get('0_50', (0, 0, 0, 0))
+    elif 50 <= sales_amount < 150:
+        return percentages.get('50_150', (4, 3, 10, 2))
+    elif 150 <= sales_amount < 300:
+        return percentages.get('150_300', (5, 4, 11, 4))
+    elif 300 <= sales_amount < 500:
+        return percentages.get('300_500', (7, 6, 12, 5))
+    elif 500 <= sales_amount < 800:
+        return percentages.get('500_800', (8, 7, 14, 6))
+    elif 800 <= sales_amount < 1000:
+        return percentages.get('800_1000', (9, 8, 21, 7))
+    elif 1000 <= sales_amount < 10000:
+        return percentages.get('1000_10000', (10, 10, 22, 8))
     else:
         return (0, 0, 0, 0)
 
@@ -53,7 +58,7 @@ def parse_people_csv(file, logs):
     print("Parsed People Data:", people_data)
     return people_data
 
-def calculate_commissions(sales_file, people, logs):
+def calculate_commissions(sales_file, people, percentages, logs):
     commissions = {}
     logs_by_month = {}
     adjustments = {}
@@ -94,9 +99,10 @@ def calculate_commissions(sales_file, people, logs):
             if person in people.people_data:
                 person_data = people.get_person_data(person)
                 monthly_sales = person_data['sales'][month - 1]  # Monthly sales for the respective month
-                percentages = get_sales_percentages(monthly_sales)
-                commission_rate = percentages[list(roles.keys()).index(role)]
+                percentages_for_range = get_sales_percentages(monthly_sales, percentages)
+                commission_rate = percentages_for_range[list(roles.keys()).index(role)]
                 commission_amount = (commission_rate / 100) * sale_amount
+                print(f"Role: {role}, Person: {person}, Monthly Sales: {monthly_sales}, Commission Rate: {commission_rate}, Commission Amount: {commission_amount}")  # Debugging output
                 if (person, month) not in commissions:
                     commissions[(person, month)] = 0
                 commissions[(person, month)] += commission_amount
@@ -130,7 +136,6 @@ def calculate_commissions(sales_file, people, logs):
 
     return commissions, logs_by_month, adjustments
 
-
 def intcomma(value):
     return "{:,}".format(value)
 
@@ -156,6 +161,53 @@ def calculate():
     people_file = request.files['people_file']
     sales_file = request.files['sales_file']
     
+    percentages = {
+        '0_50': (
+            float(request.form.get('percent_0_50_marketer', 0)),
+            float(request.form.get('percent_0_50_sales_manager', 0)),
+            float(request.form.get('percent_0_50_senior_negotiator', 0)),
+            float(request.form.get('percent_0_50_sales_coordinator', 0))
+        ),
+        '50_150': (
+            float(request.form.get('percent_50_150_marketer', 4)),
+            float(request.form.get('percent_50_150_sales_manager', 3)),
+            float(request.form.get('percent_50_150_senior_negotiator', 10)),
+            float(request.form.get('percent_50_150_sales_coordinator', 2))
+        ),
+        '150_300': (
+            float(request.form.get('percent_150_300_marketer', 5)),
+            float(request.form.get('percent_150_300_sales_manager', 4)),
+            float(request.form.get('percent_150_300_senior_negotiator', 11)),
+            float(request.form.get('percent_150_300_sales_coordinator', 4))
+        ),
+        '300_500': (
+            float(request.form.get('percent_300_500_marketer', 7)),
+            float(request.form.get('percent_300_500_sales_manager', 6)),
+            float(request.form.get('percent_300_500_senior_negotiator', 12)),
+            float(request.form.get('percent_300_500_sales_coordinator', 5))
+        ),
+        '500_800': (
+            float(request.form.get('percent_500_800_marketer', 8)),
+            float(request.form.get('percent_500_800_sales_manager', 7)),
+            float(request.form.get('percent_500_800_senior_negotiator', 14)),
+            float(request.form.get('percent_500_800_sales_coordinator', 6))
+        ),
+        '800_1000': (
+            float(request.form.get('percent_800_1000_marketer', 9)),
+            float(request.form.get('percent_800_1000_sales_manager', 8)),
+            float(request.form.get('percent_800_1000_senior_negotiator', 21)),
+            float(request.form.get('percent_800_1000_sales_coordinator', 7))
+        ),
+        '1000_10000': (
+            float(request.form.get('percent_1000_10000_marketer', 10)),
+            float(request.form.get('percent_1000_10000_sales_manager', 10)),
+            float(request.form.get('percent_1000_10000_senior_negotiator', 22)),
+            float(request.form.get('percent_1000_10000_sales_coordinator', 8))
+        ),
+    }
+    
+    print("Received percentages:", percentages)
+
     if people_file.filename == '' or sales_file.filename == '':
         return "Both files must be selected"
     
@@ -175,7 +227,7 @@ def calculate():
         people = People(people_data)
         
         with open(sales_filepath, 'r') as file:
-            commissions, logs_by_month, adjustments = calculate_commissions(file, people, logs)
+            commissions, logs_by_month, adjustments = calculate_commissions(file, people, percentages, logs)
         
         months = sorted(set(month for _, month in commissions.keys()))
         results = {}
