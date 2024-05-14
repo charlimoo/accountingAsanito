@@ -13,7 +13,6 @@ class People:
         return self.people_data.get(person_name.lower())
 
 def get_sales_percentages(sales_amount, percentages):
-    # Convert sales amount to millions for comparison
     sales_amount /= 1_000_000
     
     if 0 <= sales_amount < 50:
@@ -40,28 +39,42 @@ def parse_people_csv(file, logs):
     print("Available columns in people CSV:", headers)
     
     rows = list(reader)
-    if len(rows) < 4:
-        raise KeyError("People CSV does not contain enough rows for salary and sales data")
+    if len(rows) < 2:  # Updated to ensure at least 'Salary' row exists
+        raise KeyError("People CSV does not contain enough rows for salary data")
 
     for person in headers.values():
         if person.lower() == 'stats':
             continue
         people_data[person.lower()] = {
             'salary': float(rows[0][person]),
-            'sales': [
-                float(rows[1][person]),
-                float(rows[2][person]),
-                float(rows[3][person])
-            ]
         }
     
     print("Parsed People Data:", people_data)
     return people_data
 
+def calculate_sales_amounts(sales_file, people):
+    sales_amounts = {person: [0]*12 for person in people.people_data.keys()}
+    reader = csv.DictReader(sales_file)
+
+    for row in reader:
+        senior_negotiator = row['SeniorNegotiator'].strip().lower()
+        sale_amount = float(row['SaleAmount'])
+        month = int(row['Month'])
+
+        if senior_negotiator in sales_amounts:
+            sales_amounts[senior_negotiator][month - 1] += sale_amount
+    
+    for person in people.people_data.keys():
+        people.people_data[person]['sales'] = sales_amounts[person]
+    
+    print("Calculated Sales Amounts:", sales_amounts)
+    return people
+
 def calculate_commissions(sales_file, people, percentages, logs):
     commissions = {}
     logs_by_month = {}
     adjustments = {}
+    sales_file.seek(0)  # Reset file pointer to the beginning
     reader = csv.DictReader(sales_file)
 
     if 'SaleID' not in reader.fieldnames:
@@ -137,7 +150,6 @@ def calculate_commissions(sales_file, people, percentages, logs):
         commissions[(person, month)] = final_commission
 
     return commissions, logs_by_month, adjustments
-
 
 def intcomma(value):
     return "{:,}".format(value)
@@ -228,6 +240,9 @@ def calculate():
             people_data = parse_people_csv(file, logs)
         
         people = People(people_data)
+        
+        with open(sales_filepath, 'r') as file:
+            people = calculate_sales_amounts(file, people)
         
         with open(sales_filepath, 'r') as file:
             commissions, logs_by_month, adjustments = calculate_commissions(file, people, percentages, logs)
