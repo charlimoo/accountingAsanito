@@ -124,7 +124,7 @@ def calculate_commissions(sales_file, people, percentages, logs):
             adjustment_rate = 0.0100
         
         final_commission = total_commission - (total_commission * adjustment_rate * salary / 10000000)
-        adjustment = total_commission * adjustment_rate  # Calculate the actual adjustment amount for logging
+        adjustment = total_commission * adjustment_rate * salary / 10000000  # Calculate the actual adjustment amount for logging
         
         log_entry = {
             'index': 'تعدیلات',
