@@ -122,8 +122,10 @@ def calculate_commissions(sales_file, people, percentages, logs):
             adjustment_rate = 0.0075
         else:
             adjustment_rate = 0.0100
-        adjustment = salary * adjustment_rate
-        final_commission = total_commission - adjustment
+        
+        final_commission = total_commission - (total_commission * adjustment_rate * salary / 10000000)
+        adjustment = total_commission * adjustment_rate  # Calculate the actual adjustment amount for logging
+        
         log_entry = {
             'index': 'تعدیلات',
             'details': f"{person.capitalize()} \n    کل کمیسیون: {total_commission:,.2f}\n    حقوق: {salary:,.2f}\n    نرخ کسر: {adjustment_rate * 100}%\n    کسر: {adjustment:,.2f}\n    کمیسیون نهایی: {final_commission:,.2f}"
@@ -135,6 +137,7 @@ def calculate_commissions(sales_file, people, percentages, logs):
         commissions[(person, month)] = final_commission
 
     return commissions, logs_by_month, adjustments
+
 
 def intcomma(value):
     return "{:,}".format(value)
