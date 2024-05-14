@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission Results</title>
+    <style>
+        body {
+            font-family: "Vazirmatn", sans-serif !important;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            text-align: center;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            color: #333;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        tr:hover {
+            background-color: #f2f2f2;
+        }
+
+        pre {
+            font-family: "Vazirmatn", sans-serif !important;
+            font-size: 13px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .accordion {
+            font-family: "Vazirmatn", sans-serif !important;
+            font-size: 13px;
+            background-color: #f7f7f7;
+            color: #444;
+            cursor: pointer;
+            padding: 10px;
+            width: 100%;
+            border: none;
+            text-align: right;
+            outline: none;
+            font-size: 15px;
+            transition: 0.4s;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .active, .accordion:hover {
+            background-color: #383838;
+            color: rgb(255, 255, 255);
+        }
+
+        .panel {
+            padding: 10px;
+            background-color: #fafafa;
+            display: none;
+            overflow: hidden;
+            border-bottom: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="direction: rtl !important; text-align:right;">
+        <h1>کمیسیون ها</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ماه</th>
+                    <th>شخص</th>
+                    <th>کمیسیون (ریال)</th>
+                </tr>
+            </thead>
+            <tbody style="text-align: center;">
+                {% for month, data in results.items() %}
+                    {% for person, commission in data.items() %}
+                        <tr>
+                            {% if loop.first %}
+                                <td rowspan="{{ data|length }}">{{ month }}</td>
+                            {% endif %}
+                            <td>{{ person }}</td>
+                            <td>{{ commission }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <hr style="border:solid; border-width: 1px; border-color:rgb(230, 230, 230); margin-top: 24px;margin-bottom: 24px;">
+
+        <div style="direction: rtl !important; text-align:right;">  
+            {% for month, sales in logs_by_month.items() %}
+                <button class="accordion">محاسبات ماه {{ month }}</button>
+                <div class="panel">
+                    {% for sale_id, sale_data in sales.items() %}
+                        {% if sale_id != 'adjustments' %}
+                            <button class="accordion">فروش مبلغ: {{ sale_data.amount | intcomma }} ریال</button>
+                            <div class="panel">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="direction: rtl !important; text-align:right;font-size: 13px;">مرحله</th>
+                                            <th style="direction: rtl !important; text-align:right;font-size: 13px;">جزئیات</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for log in sale_data.details %}
+                                            <tr>
+                                                <td style="direction: rtl !important; text-align:right;">{{ log.index }}</td>
+                                                <td style="direction: rtl !important; text-align:right;"><pre>{{ log.details }}</pre></td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                    {% if adjustments[month] %}
+                        <button class="accordion">کسر بر پایه حقوق</button>
+                        <div class="panel">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th style="direction: rtl !important; text-align:right;font-size: 13px;">جزئیات</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for adjustment in adjustments[month] %}
+                                        <tr>
+                                            <td style="direction: rtl !important; text-align:right;"><pre>{{ adjustment }}</pre></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var acc = document.getElementsByClassName("accordion");
+            for (var i = 0; i < acc.length; i++) {
+                acc[i].addEventListener("click", function() {
+                    this.classList.toggle("active");
+                    var panel = this.nextElementSibling;
+                    if (panel.style.display === "block") {
+                        panel.style.display = "none";
+                    } else {
+                        panel.style.display = "block";
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

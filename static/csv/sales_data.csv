@@ -1,0 +1,7 @@
+Marketer,SalesManager,SeniorNegotiator,SalesCoordinator,SaleAmount,Month
+parinaz,amanj,samira,milad,1000000000,1
+parinaz,parinaz,milad,amanj,2000000000,1
+amanj,samira,parinaz,tamimi,1000000000,1
+tamimi,tamimi,amanj,amanj,2000000000,2
+milad,parinaz,tamimi,samira,1000000000,2
+parinaz,milad,amanj,samira,2000000000,3

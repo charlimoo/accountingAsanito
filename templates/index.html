@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+    <meta charset="UTF-8">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>محاسبه کمیسیون</title>
+    <style>
+        body {
+            direction: rtl !important;
+            font-family: "Vazirmatn", sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        input[type="file"] {
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 97%; /* Make the input take the full width */
+        }
+        
+        button {
+            font-family: "Vazirmatn", sans-serif;
+            padding: 10px 20px;
+            background-color: #161616;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        table {
+            direction: ltr !important;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 5px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .small-table {
+            font-size: 0.8em; /* Smaller font size */
+        }
+
+        .small-table th {
+            font-size: 0.9em; /* Smaller heading size */
+        }
+
+        .small-table th, .small-table td {
+            padding: 4px; /* Smaller padding */
+        }
+
+        .download-btn {
+            font-size: 12px;
+            padding: 6px 12px;
+            background-color: #1e1e1e;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .download-btn:hover {
+            background-color: #0056b3;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>محاسبه کمیسیون</h1>
+        <form action="/calculate" method="post" enctype="multipart/form-data">
+            <label for="people_file">فایل داده‌های افراد CSV:</label>
+            <input type="file" name="people_file" id="people_file" accept=".csv" required>
+            <label for="sales_file">فایل داده‌های فروش CSV:</label>
+            <input type="file" name="sales_file" id="sales_file" accept=".csv" required>
+            <button type="submit">محاسبه</button>
+        </form>
+        
+        <hr style="border:solid; border-width: 1px; border-color:#ccc; margin: 32px;">
+        
+        <div class="table-header">
+            <h2 style="font-size: 14px;">فرمت نمونه فایل داده‌های افراد CSV:</h2>
+            <a href="{{ url_for('download_file', filename='people_data.csv') }}" class="download-btn" download>دانلود</a>
+        </div>
+
+        <table class="small-table">
+            <thead>
+                <tr>
+                    <th>Stats</th>
+                    <th>Parinaz</th>
+                    <th>Amanj</th>
+                    <th>Tamimi</th>
+                    <th>Milad</th>
+                    <th>Samira</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Salary</td>
+                    <td>100000000</td>
+                    <td>200000000</td>
+                    <td>100000000</td>
+                    <td>200000000</td>
+                    <td>100000000</td>
+                </tr>
+                <tr>
+                    <td>SalesAmountMonth1</td>
+                    <td>1100000000</td>
+                    <td>5500000000</td>
+                    <td>1100000000</td>
+                    <td>5500000000</td>
+                    <td>1100000000</td>
+                </tr>
+                <tr>
+                    <td>SalesAmountMonth2</td>
+                    <td>2000000000</td>
+                    <td>4000000000</td>
+                    <td>2000000000</td>
+                    <td>4000000000</td>
+                    <td>2000000000</td>
+                </tr>
+                <tr>
+                    <td>SalesAmountMonth3</td>
+                    <td>3000000000</td>
+                    <td>1000000000</td>
+                    <td>3000000000</td>
+                    <td>1000000000</td>
+                    <td>3000000000</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <hr style="border:solid; border-width: 1px; border-color:#ccc; margin: 32px;">
+        
+        <div class="table-header">
+            <h2 style="font-size: 14px;">فرمت نمونه فایل داده‌های فروش CSV:</h2>
+            <a href="{{ url_for('download_file', filename='sales_data.csv') }}" class="download-btn" download>دانلود</a>
+        </div>
+        <table class="small-table">
+            <thead>
+                <tr>
+                    <th>Marketer</th>
+                    <th>Sales Manager</th>
+                    <th>Senior Negotiator</th>
+                    <th>Sales Coordinator</th>
+                    <th>Sale Amount</th>
+                    <th>Month</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>parinaz</td>
+                    <td>amanj</td>
+                    <td>samira</td>
+                    <td>milad</td>
+                    <td>1000000000</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>parinaz</td>
+                    <td>parinaz</td>
+                    <td>milad</td>
+                    <td>amanj</td>
+                    <td>2000000000</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>amanj</td>
+                    <td>samira</td>
+                    <td>parinaz</td>
+                    <td>tamimi</td>
+                    <td>1000000000</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <td>tamimi</td>
+                    <td>tamimi</td>
+                    <td>amanj</td>
+                    <td>amanj</td>
+                    <td>2000000000</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>milad</td>
+                    <td>parinaz</td>
+                    <td>tamimi</td>
+                    <td>samira</td>
+                    <td>1000000000</td>
+                    <td>2</td>
+                </tr>
+                <tr>
+                    <td>parinaz</td>
+                    <td>milad</td>
+                    <td>amanj</td>
+                    <td>samira</td>
+                    <td>2000000000</td>
+                    <td>3</td>
+                </tr>
+            </tbody>
+        </table>
+        
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
